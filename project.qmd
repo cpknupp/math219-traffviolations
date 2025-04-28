@@ -1,0 +1,24 @@
+---
+title: "My Document"
+format:
+  pdf
+---
+
+# Packages
+
+```{R}
+#install.packages('rmarkdown')
+#install.packages('readxl') -- Used for importing xlsx spreadsheets.
+#install.packages('tidyverse')
+library(rmarkdown)
+library(readxl)
+library(tidyverse)
+```
+
+# Importing Table
+
+```{R}
+traff_violations <- read_excel('AttemptTwo.xlsx')
+
+
+```

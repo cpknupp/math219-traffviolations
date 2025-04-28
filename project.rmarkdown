@@ -1,0 +1,26 @@
+---
+title: "My Document"
+format:
+  pdf
+---
+
+
+
+# Used Packages
+
+
+```{R}
+#install.packages('rmarkdown')
+#install.packages('readxl') -- Used for importing xlsx spreadsheets.
+library(rmarkdown)
+library(readxl)
+```
+
+
+
+# Importing Spreadsheet.
+
+
+```{R}
+traff_violations <- read_excel('FullyCondensedData.xlsx')
+```
