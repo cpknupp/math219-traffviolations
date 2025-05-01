@@ -19,6 +19,42 @@ library(tidyverse)
 
 ```{R}
 traff_violations <- read_excel('AttemptTwo.xlsx')
+#print(traff_violations)
+
+#Description of Violation
+most_common_description <- traff_violations %>%
+  count(Description) %>%
+  arrange(desc(n)) %>%
+  slice(1:5)
+print(most_common_description)
+
+#Vehicle Year
+most_common_vehicle_year <- traff_violations %>%
+  count(Year) %>%
+  arrange(desc(n)) %>%
+  slice(1:10)
+print(most_common_vehicle_year)
+
+#Vehicle Make
+most_common_vehicle_make <- traff_violations %>%
+  count(Make) %>%
+  arrange(desc(n)) 
+  #%>% slice(1:5)
+print(most_common_vehicle_make)
+
+#Vehicle Model
+most_common_vehicle_model <- traff_violations %>%
+  count(Model) %>%
+  arrange(desc(n)) %>%
+  slice(1:5)
+print(most_common_vehicle_model)
+
+#Race of Driver
+most_common_race <- traff_violations %>%
+  count(Race) %>%
+  arrange(desc(n)) 
+  #%>% slice(1:5)
+print(most_common_race)
 
 
 ```
