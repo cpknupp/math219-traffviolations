@@ -22,5 +22,7 @@ library(readxl)
 
 
 ```{R}
+
 traff_violations <- read_excel('FullyCondensedData.xlsx')
+
 ```
