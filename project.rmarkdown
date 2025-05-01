@@ -11,7 +11,7 @@ format:
 
 ```{R}
 #install.packages('rmarkdown')
-#install.packages('readxl') -- Used for importing xlsx spreadsheets.
+#install.packages('readxl') #-- Used for importing xlsx spreadsheets.
 library(rmarkdown)
 library(readxl)
 ```
