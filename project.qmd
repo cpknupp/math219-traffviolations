@@ -61,25 +61,5 @@ alcohol <- traff_violations %>% count(Alcohol)
 ggplot(alcohol, aes(Alcohol, n, fill = Alcohol))+ geom_bar(stat = "identity")
 
 
-df <- traff_violations %>%
-  mutate(
-    datetime = as.POSIXct(paste(`Date Of Stop`, `Time Of Stop`), format = "%Y-%m-%d %H:%M:%S"),
-    hour = hour(datetime),
-    weekday = wday(datetime, label = TRUE, abbr = FALSE)
-  ) %>%
-  count(weekday, hour)
 
-
-
-ggplot(df, aes(x = hour, y = fct_rev(weekday), fill = n)) +
-  geom_tile() +
-  geom_text(aes(label = n), color = "black", size = 3) +
-  scale_fill_gradient(low = "#f0f9e8", high = "#08589e") +
-  labs(
-    title = "Traffic Stops by Hour and Day of Week",
-    x = "Hour of Day",
-    y = "Day of Week",
-    fill = "Number of Stops"
-  ) +
-  theme_minimal()
 ```
