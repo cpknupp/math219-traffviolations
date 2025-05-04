@@ -1,5 +1,6 @@
 ---
-title: "My Document"
+title: "Data Analysis on Traffic Violations"
+subtitle: "Test"
 format:
   pdf
 ---
@@ -10,9 +11,11 @@ format:
 #install.packages('rmarkdown')
 #install.packages('readxl') #-- Used for importing xlsx spreadsheets.
 #install.packages('tidyverse')
+#install.packages('ggrounded') -- Used for fancier bars.
 library(rmarkdown)
 library(readxl)
 library(tidyverse)
+library(ggrounded)
 ```
 
 # Importing Table & Sorting Data
@@ -21,33 +24,108 @@ library(tidyverse)
 traff_violations <- read_excel('AttemptTwo.xlsx')
 traff_violations
 
+# Modifications for proper time and day.
+traff_violations <- traff_violations %>%
+  mutate(
+    TimeOnly = format(`Time Of Stop`, "%H:%M:%S"),
+    FullDateTime = ymd_hms(paste(`Date Of Stop`, TimeOnly)),
+    Hour = hour(FullDateTime),
+    Day = wday(FullDateTime, label = TRUE, abbr = FALSE)
+  )
+
 #Description of Violation
-most_common_description <- traff_violations %>%
+most_common_desc <- traff_violations %>%
   count(Description) %>%
   arrange(desc(n)) %>%
   slice(1:5)
-print(most_common_description)
+print(most_common_desc)
 
 #Vehicle Year
-most_common_vehicle_year <- traff_violations %>%
+most_common_vyear <- traff_violations %>%
   count(Year) %>%
   arrange(desc(n)) %>%
   slice(1:10)
-print(most_common_vehicle_year)
+print(most_common_vyear)
 
 #Vehicle Make
-most_common_vehicle_make <- traff_violations %>%
+most_common_vmake <- traff_violations %>%
+  mutate(Make = str_replace_all(Make, c(
+    "CHEVY" = "CHEVROLET",
+    "CHEV" = "CHEVROLET",
+    "TOYT" = "TOYOTA",
+    "HOND" = "HONDA",
+    "HONDAA" = "HONDA",
+    "CHEVROLETROLET" = "CHEVROLET",
+    "VOLK" = "VOLKSWAGON",
+    "VW" = "VOLKSWAGON",
+    "HYUN" = "HYUNDAI",
+    "TOTOTA" = "TOYOTA",
+    "TOTYOA" = "TOYOTA",
+    "TOYORA" = "TOYOTA",
+    "HYUNDAIDAI" = "HYUNDAI",
+    "MERZ" = "MERCEDES",
+    "NISS" = "NISSAN",
+    "DODG" = "DODGE",
+    "MAZD" = "MAZDA",
+    "MAZDAA" = "MAZDA",
+    "DODGEE" = "DODGE",
+    "ACUR" = "ACURA",
+    "ACURAA" = "ACURA",
+    "NISSANAN" = "NISSAN",
+    "SUBA" = "SUBARU",
+    "SUBARURU" = "SUBARU",
+    "VOLKSWAGONSWAGEN" = "VOLKSWAGON",
+    "VOLKSWAGONSWAGON" = "VOLKSWAGON",
+    "INFI" = "INFINITI",
+    "INFINITINITI" = "INFINITI",
+    "MITS" = "MITSUBISHI",
+    "MITSUBISHIUBISHI" = "MITSUBISHI",
+    "VOLKSWAGONS" = "VOLKSWAGON",
+    "TOYOT" = "TOYOTA",
+    "TOYOTAAA" = "TOYOTA",
+    "TOYO" = "TOYOTA",
+    "TOYOTATA" = "TOYOTA",
+    "TOYOTAA" = "TOYOTA",
+    "HYUNDAID" = "HYUNDAI",
+    "MAZADA" = "MAZDA",
+    "CHRY" = "CRYSLER",
+    "CHEVROLETORLET" = "CHEVROLET",
+    "TOYOTAOA" = "TOYOTA",
+    "VOLV" = "VOLVO",
+    "VOLVOO" = "VOLVO",
+    "MERCEDES" = "MERCEDES BENZ",
+    "MERC" = "MERCEDES BENZ",
+    "MERCEDES BENZURY" = "MERCEDES BENZ",
+    "MERCEDES BENZEDES BENZ" = "MERCEDES BENZ",
+    "MERCEDES BENZEDEZ" = "MERCEDES BENZ",
+    "MERCEDES BENZ BENZ" = "MERCEDES BENZ",
+    "MERCEDES BENZ-BENZ" = "MERCEDES BENZ",
+    "CRYSLERSLER" = "CHRYSLER",
+    "CRYSLER" = "CHRYSLER",
+    "CHEVROLETE" = "CHEVROLET",
+    "CHEVROLETY" = "CHEVROLET",
+    "CHEVROLETROLET" = "CHEVROLET",
+    "CHECY" = "CHEVROLET",
+    "CVEVROLET" = "CHEVROLET",
+    "HYUNDAII" = "HYUNDAI",
+    "HYUNDAIIA" = "HYUNDAI",
+    "HYUNDAIA" = "HYUNDAI",
+    "TOY" = "TOYOTA",
+    "TOYOTAOTA" = "TOYOTA",
+    "HINDA" = "HONDA"
+  ))) %>%
   count(Make) %>%
-  arrange(desc(n)) 
-  #%>% slice(1:5)
-print(most_common_vehicle_make)
-
-#Vehicle Model
-most_common_vehicle_model <- traff_violations %>%
-  count(Model) %>%
   arrange(desc(n)) %>%
   slice(1:5)
-print(most_common_vehicle_model)
+print(most_common_vmake)
+
+#  Useful???
+#Vehicle Model
+#most_common_vmodel <- traff_violations %>%
+  #count(Model) %>%
+  #arrange(desc(n)) %>%
+  #slice(1:5)
+#print(most_common_vmodel)
 
 #Race of Driver
 most_common_race <- traff_violations %>%
@@ -56,30 +134,30 @@ most_common_race <- traff_violations %>%
   #%>% slice(1:5)
 print(most_common_race)
 
-alcohol <- traff_violations %>% count(Alcohol)
 
-ggplot(alcohol, aes(Alcohol, n, fill = Alcohol))+ geom_bar(stat = "identity")
-
-
-df <- traff_violations %>%
-  mutate(
-    datetime = as.POSIXct(paste(`Date Of Stop`, `Time Of Stop`), format = "%Y-%m-%d %H:%M:%S"),
-    hour = hour(datetime),
-    weekday = wday(datetime, label = TRUE, abbr = FALSE)
-  ) %>%
-  count(weekday, hour)
+top_ratios <- traff_violations
+```
 
 
+# Plot 1 - Top Five Common Vehicle Makes Pulled Over
+```{R}
+ggplot(data = most_common_vmake, aes(x= reorder(Make, -n), y= n, fill = Make)) + 
+ geom_col_rounded(width = 0.5) + scale_y_continuous(expand = c(0, 0))+
+ labs(title = "Top Five Common Vehicle Makes Pulled Over") + xlab("Make") + ylab("Amount") + theme(legend.position = "none", plot.title = element_text(hjust = 0.5, face = "bold"))
 
-ggplot(df, aes(x = hour, y = fct_rev(weekday), fill = n)) +
-  geom_tile() +
-  geom_text(aes(label = n), color = "black", size = 3) +
-  scale_fill_gradient(low = "#f0f9e8", high = "#08589e") +
-  labs(
-    title = "Traffic Stops by Hour and Day of Week",
-    x = "Hour of Day",
-    y = "Day of Week",
-    fill = "Number of Stops"
-  ) +
-  theme_minimal()
+print(most_common_vmake)
+```
+
+
+# Plot 2 - Traffic Stops by Day and Hour
+```{R}
+traff_violations %>% 
+  count(Hour, Day) %>%
+  ggplot(aes(Hour, Day, fill = n)) + geom_tile(color = 'black') + scale_x_continuous(expand = c(0, 0)) + scale_y_discrete(expand = c(0, 0)) + labs(title = "Traffic Stops by Day and Hour", x = "Hour of Day", y = "Day of Week", fill = "Stops") +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+
+```
+
+# Plot 3 - Title Coming Soon
+```{R}
 ```
