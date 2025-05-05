@@ -5,7 +5,19 @@ format:
   pdf
 ---
 # Introduction
+Our Project deals with police traffic stops that happen every day on roadways across America. It is an essential part of law enforcment to stop drivers from speeding, carrying illegal substances, or to return stolen vehicles to their rightful owner. There are many different violations of traffic law that can initiate a traffic stop and the data regarding those stops is what we chose to look at. We thought that it would be interesting to analyze data from police traffic stops because there is a lot of information police are required to keep track of when they pull someone over such as the Date, Time of Day, Traffic Violation, Vehicle Make, Model and Year, Use of Alcohol, Race, Sex, Seatbelt Use, Accidents, Injuries, City, State, Etc. We sourced our data specifically from Montgomery County in Maryland. The data does not have information that can be used to uniquely identify the vehicle, the vehicle owner or the officer, but has plenty of other stuff for our use. The dataset we use is an excel file containing 10,000 rows, each being its own traffic stop. With all this data, we had to determine what questions we could ask that would be interesting and informative. We came up with the list below:
 
+With the data analysis and graphs in this report we seek to answer the following questions:
+
+1.)  What vehicle makes get pulled over the most often?
+2.)  What times during the week are traffic stops more likely to happen?
+3.)  What times during the year are traffic stops more likely to happen?
+4.)  What times during the past decade did traffic stops happen the most?
+5.)  Does using your seatbelt actually help prevent injury when in an accident?
+6.)  How do race and gender apply to traffic violations?
+7.)  Who is most likely to commit a traffic violation in Maryland? (Marylanders or Non-Marylanders?)
+
+Here is our implementation of our R code:
 
 # Load Packages
 
@@ -21,7 +33,6 @@ library(ggrounded)
 ```
 
 # Load the Data
-
 ```{R}
 traff_violations <- read_excel('AttemptTwo.xlsx')
 traff_violations
@@ -38,20 +49,17 @@ traff_violations <- traff_violations %>%
     Day = wday(FullDateTime, label = TRUE, abbr = FALSE)
   )
 
-
 #Description of Violation
 most_common_desc <- traff_violations %>%
   count(Description) %>%
   arrange(desc(n)) %>%
   slice(1:5)
-print(most_common_desc)
 
 #Vehicle Year
 most_common_vyear <- traff_violations %>%
   count(Year) %>%
   arrange(desc(n)) %>%
   slice(1:10)
-print(most_common_vyear)
 
 #Vehicle Make
 most_common_vmake <- traff_violations %>%
@@ -123,7 +131,6 @@ most_common_vmake <- traff_violations %>%
   count(Make) %>%
   arrange(desc(n)) %>%
   slice(1:5)
-print(most_common_vmake)
 
 
 #Race of Driver
@@ -131,7 +138,6 @@ most_common_race <- traff_violations %>%
   count(Race) %>%
   arrange(desc(n)) 
   #%>% slice(1:5)
-print(most_common_race)
 ```
 
 # Analyze the Tidy Data
