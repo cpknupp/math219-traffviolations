@@ -1,15 +1,30 @@
+
 ---
-title: "Data Analysis on Traffic Violations"
-subtitle: "Test"
+title: "Analysis of Traffic Stops and Violations"
+authors: "By: Connor Knupp, Ethan Zuwiala, Joe Wenger"
 format:
   pdf
 ---
+# Introduction
+Our Project deals with police traffic stops that happen every day on roadways across America. It is an essential part of law enforcment to stop drivers from speeding, carrying illegal substances, or to return stolen vehicles to their rightful owner. There are many different violations of traffic law that can initiate a traffic stop and the data regarding those stops is what we chose to look at. We thought that it would be interesting to analyze data from police traffic stops because there is a lot of information police are required to keep track of when they pull someone over such as the Date, Time of Day, Traffic Violation, Vehicle Make, Model and Year, Use of Alcohol, Race, Sex, Seatbelt Use, Accidents, Injuries, City, State, Etc. We sourced our data specifically from Montgomery County in Maryland. The data does not have information that can be used to uniquely identify the vehicle, the vehicle owner or the officer, but has plenty of other stuff for our use. The dataset we use is an excel file containing 10,000 rows, each being its own traffic stop. With all this data, we had to determine what questions we could ask that would be interesting and informative. We came up with the list below:
 
-# Packages
+With the data analysis and graphs in this report we seek to answer the following questions:
+
+1.)  What vehicle makes get pulled over the most often?
+2.)  What times during the week are traffic stops more likely to happen?
+3.)  What times during the year are traffic stops more likely to happen?
+4.)  What times during the past decade did traffic stops happen the most?
+5.)  Does using your seatbelt actually help prevent injury when in an accident?
+6.)  How do race and gender apply to traffic violations?
+7.)  Who is most likely to commit a traffic violation in Maryland? (Marylanders or Non-Marylanders?)
+
+Here is our implementation of our R code:
+
+# Load Packages
 
 ```{R}
 #install.packages('rmarkdown')
-#install.packages('readxl') #-- Used for importing xlsx spreadsheets.
+#install.packages('readxl') -- Used for importing xlsx spreadsheets.
 #install.packages('tidyverse')
 #install.packages('ggrounded') -- Used for fancier bars.
 library(rmarkdown)
@@ -18,12 +33,14 @@ library(tidyverse)
 library(ggrounded)
 ```
 
-# Importing Table & Sorting Data
-
+# Load the Data
 ```{R}
 traff_violations <- read_excel('AttemptTwo.xlsx')
 traff_violations
+```
 
+# Tidy the Data
+```{R}
 # Modifications for proper time and day.
 traff_violations <- traff_violations %>%
   mutate(
@@ -38,14 +55,12 @@ most_common_desc <- traff_violations %>%
   count(Description) %>%
   arrange(desc(n)) %>%
   slice(1:5)
-print(most_common_desc)
 
 #Vehicle Year
 most_common_vyear <- traff_violations %>%
   count(Year) %>%
   arrange(desc(n)) %>%
   slice(1:10)
-print(most_common_vyear)
 
 #Vehicle Make
 most_common_vmake <- traff_violations %>%
@@ -117,29 +132,18 @@ most_common_vmake <- traff_violations %>%
   count(Make) %>%
   arrange(desc(n)) %>%
   slice(1:5)
-print(most_common_vmake)
 
-#  Useful???
-#Vehicle Model
-#most_common_vmodel <- traff_violations %>%
-  #count(Model) %>%
-  #arrange(desc(n)) %>%
-  #slice(1:5)
-#print(most_common_vmodel)
 
 #Race of Driver
 most_common_race <- traff_violations %>%
   count(Race) %>%
   arrange(desc(n)) 
   #%>% slice(1:5)
-print(most_common_race)
-
-
-top_ratios <- traff_violations
 ```
 
+# Analyze the Tidy Data
 
-# Plot 1 - Top Five Common Vehicle Makes Pulled Over
+## Plot 1 - Top Five Common Vehicle Makes Pulled Over
 ```{R}
 ggplot(data = most_common_vmake, aes(x= reorder(Make, -n), y= n, fill = Make)) + 
  geom_col_rounded(width = 0.5) + scale_y_continuous(expand = c(0, 0))+
@@ -149,7 +153,7 @@ print(most_common_vmake)
 ```
 
 
-# Plot 2 - Traffic Stops by Day and Hour
+## Plot 2 - Traffic Stops by Day and Hour
 ```{R}
 traff_violations %>% 
   count(Hour, Day) %>%
@@ -158,11 +162,79 @@ traff_violations %>%
 
 ```
 
-# Plot 3 - Title Coming Soon
+## Plot 3 - Traffic Stops Per Month
 ```{R}
+monthly_stops <- traff_violations %>%
+  mutate(Month = month(`Date Of Stop`, label = TRUE, abbr = TRUE)) %>%
+  count(Month)
+
+ggplot(monthly_stops, aes(Month, n))+geom_line(group = 1, color = 'darkblue')+geom_point(color ='darkblue') + labs(title = "Traffic Stops Per Month")+theme(plot.title = element_text(hjust = 0.5, face = "bold"))+ ylab("Number of Stops")
+
+monthly_stops
 ```
-#
+
+## Plot 4 - Traffic Stops Per Year
 ```{R}
+yearly_stops <- traff_violations %>%
+  mutate(Year = year(`Date Of Stop`)) %>%
+  count(Year)
 
+ggplot(yearly_stops, aes(Year, n))+geom_line(group = 1, color = 'red')+geom_point(color ='black') + labs(title = "Traffic Stops Per Year")+theme(plot.title = element_text(hjust = 0.5, face = "bold"))+ ylab("Number of Stops")
+
+yearly_stops
 ```
 
+
+## Plot 5 - Correlation of Injury and Seatbelt Use in Accidents
+```{R}
+traff_violations_filtered <- traff_violations %>% filter(Accident == "Yes")
+traff_violations_filtered <- traff_violations_filtered %>%
+  mutate(Belts = ifelse(Belts == "Yes", "N", Belts))
+traff_violations_filtered <- traff_violations_filtered %>%
+  mutate(Belts = ifelse(Belts == "No", "Yes", Belts))
+traff_violations_filtered <- traff_violations_filtered %>%
+  mutate(Belts = ifelse(Belts == "N", "No", Belts))
+traff_violations_filtered %>% 
+  count(`Belts`, `Personal Injury`) %>%
+  ggplot(aes(x = `Belts`, y = `Personal Injury`, fill = n)) +
+  geom_tile(color = "white") +
+  geom_text(aes(label = n), color = "black", size = 5) +
+  scale_fill_gradient(low = "lightblue", high = "darkblue") +
+  labs(title = "Heatmap of Injury and Seatbelt Use in Vehicle Accidents",
+       x = "Wore Seat Belts", y = "Personal Injury", fill = "Count") +
+  theme_minimal()
+```
+
+## Plot 6 - Traffic Violations by Race and Gender
+```{R}
+race_gender_counts <- traff_violations %>%
+  count(Race, Gender)
+
+race_gender_counts
+ggplot(race_gender_counts, aes(x = Gender, y = n, fill = Gender)) +
+  geom_col(width = 0.5) +
+  facet_wrap(~ Race)+ labs(title = "Traffic Violations by Race and Gender")+
+  ylab("Number of Stops")+theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+```
+
+## Plot 7 -- Traffic Violations per Geographic Area
+```{R}
+traff_violations_filtered_2 <- traff_violations %>%
+  mutate(`Driver State` = ifelse(`Driver State` != "MD", "Out of State", `Driver State`))
+traff_violations_filtered_2 <- traff_violations_filtered_2 %>%
+  mutate(`Driver State` = ifelse(`Driver State` == "MD", "Maryland", `Driver State`))
+traff_violations_filtered_2 %>%
+  count(`Driver State`) %>%
+  ggplot(aes(x = reorder(`Driver State`, n), y = n)) + 
+  geom_bar(stat = "identity", fill = "steelblue") +
+  geom_text(aes(label = n), hjust = 1.1, size = 4) +
+  coord_flip() +
+  labs(title = "Counts of MD vs non MD Drivers",
+       x = "Category",
+       y = "Count") +
+  #scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+  scale_y_continuous(breaks = seq(0, max(9000), by = 1000)) +
+  theme_minimal()
+```
+
+## Further Analyses / Conclusion
