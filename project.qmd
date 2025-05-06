@@ -6,30 +6,21 @@ format:
   pdf
 ---
 # Introduction
-Our Project deals with police traffic stops that happen every day on roadways across America. It is an essential part of law enforcement to stop drivers from speeding, carrying illegal substances, or to return stolen vehicles to their rightful owner. There are many different violations of traffic law that can initiate a traffic stop and the data regarding those stops is what we chose to look at. We thought that it would be interesting to analyze data from police traffic stops because there is a lot of information police are required to keep track of when they pull someone over such as the Date, Time of Day, Traffic Violation, Vehicle Make, Model and Year, Use of Alcohol, Race, Sex, Seatbelt Use, Accidents, Injuries, City, State, Etc. We sourced our data specifically from Montgomery County in Maryland. The data does not have information that can be used to uniquely identify the vehicle, the vehicle owner or the officer, but has plenty of other stuff for our use. The dataset we use is an excel file containing 10,000 rows, each being its own traffic stop. With all this data, we had to determine what questions we could ask that would be interesting and informative. We came up with the list below:
+Our Project deals with police traffic stops that happen every day on roadways across America. It is an essential part of law enforcement to stop drivers from speeding, carrying illegal substances, or to return stolen vehicles to their rightful owner. There are many different violations of traffic law that can initiate a traffic stop and the data regarding those stops is what we chose to look at. We thought that it would be interesting to analyze data from police traffic stops because there is a lot of information police are required to keep track of when they pull someone over such as the Date, Time of Day, Traffic Violation, Vehicle Make, Model and Year, Use of Alcohol, Race, Sex, Seatbelt Use, Accidents, Injuries, City, State, Etc. We sourced our data specifically from Montgomery County in Maryland. The data does not have information that can be used to uniquely identify the vehicle, the vehicle owner or the officer, but has plenty of other stuff for our use. The dataset we use is an excel file containing 10,000 rows, each being its own traffic stop. With all this data, we had to determine what questions we could ask that would be interesting and informative. We came up with the list below.
+
+The data we used for our report can be found on: https://catalog.data.gov/dataset/traffic-violations
 
 With the data analysis and graphs in this report we seek to answer the following questions:
 
-1.)  What vehicle makes get pulled over the most often?
-2.)  What times during the week are traffic stops more likely to happen?
-3.)  What times during the year are traffic stops more likely to happen?
-4.)  What times during the past decade did traffic stops happen the most?
-5.)  Does using your seatbelt actually help prevent injury when in an accident?
-6.)  How do race and gender apply to traffic violations?
-7.)  Who is most likely to commit a traffic violation in Maryland? (Marylanders or Non-Marylanders?)
-
-Here is our implementation of our R code:
+1. What vehicle makes get pulled over the most often?
+2. What times during the week are traffic stops more likely to happen?
+3. What times during the year are traffic stops more likely to happen?
+4. What times during the past decade did traffic stops happen the most?
+5. Does using your seatbelt actually help prevent injury when in an accident?
+6. How do race and gender apply to traffic violations?
+7. Who is most likely to commit a traffic violation in Maryland? (Marylanders or Non-Marylanders?)
 
 
-With the data analysis and graphs in this report we seek to answer the following questions:
-
-1.)  What vehicle makes get pulled over the most often?
-2.)  What times during the week are traffic stops more likely to happen?
-3.)  What times during the year are traffic stops more likely to happen?
-4.)  What times during the past decade did traffic stops happen the most?
-5.)  Does using your seatbelt actually help prevent injury when in an accident?
-6.)  How do race and gender apply to traffic violations?
-7.)  Who is most likely to commit a traffic violation in Maryland? (Marylanders or Non-Marylanders?)
 
 Here is our implementation of our R code:
 
@@ -160,7 +151,9 @@ most_common_race <- traff_violations %>%
 ```{R}
 ggplot(data = most_common_vmake, aes(x= reorder(Make, -n), y= n, fill = Make)) + 
  geom_col_rounded(width = 0.5) + scale_y_continuous(expand = c(0, 0))+
- labs(title = "Top Five Common Vehicle Makes Pulled Over") + xlab("Make") + ylab("Amount") + theme(legend.position = "none", plot.title = element_text(hjust = 0.5, face = "bold"))
+ labs(title = "Top Five Common Vehicle Makes Pulled Over") + xlab("Make") + 
+  ylab("Amount") + theme(legend.position = "none", plot.title = 
+                           element_text(hjust = 0.5, face = "bold"))
 
 print(most_common_vmake)
 ```
@@ -170,7 +163,10 @@ print(most_common_vmake)
 ```{R}
 traff_violations %>% 
   count(Hour, Day) %>%
-  ggplot(aes(Hour, Day, fill = n)) + geom_tile(color = 'black') + scale_x_continuous(expand = c(0, 0)) + scale_y_discrete(expand = c(0, 0)) + labs(title = "Traffic Stops by Day and Hour", x = "Hour of Day", y = "Day of Week", fill = "Stops") +
+  ggplot(aes(Hour, Day, fill = n)) + geom_tile(color = 'black') + 
+  scale_x_continuous(expand = c(0, 0)) + scale_y_discrete(expand = c(0, 0)) + 
+  labs(title = "Traffic Stops by Day and Hour", x = "Hour of Day", 
+       y = "Day of Week", fill = "Stops") +
   theme(plot.title = element_text(hjust = 0.5, face = "bold"))
 
 ```
@@ -181,7 +177,10 @@ monthly_stops <- traff_violations %>%
   mutate(Month = month(`Date Of Stop`, label = TRUE, abbr = TRUE)) %>%
   count(Month)
 
-ggplot(monthly_stops, aes(Month, n))+geom_line(group = 1, color = 'darkblue')+geom_point(color ='darkblue') + labs(title = "Traffic Stops Per Month")+theme(plot.title = element_text(hjust = 0.5, face = "bold"))+ ylab("Number of Stops")
+ggplot(monthly_stops, aes(Month, n))+geom_line(group = 1, color = 'darkblue')+
+  geom_point(color ='darkblue') + labs(title = "Traffic Stops Per Month")+
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"))+
+  ylab("Number of Stops")
 
 monthly_stops
 ```
@@ -192,7 +191,9 @@ yearly_stops <- traff_violations %>%
   mutate(Year = year(`Date Of Stop`)) %>%
   count(Year)
 
-ggplot(yearly_stops, aes(Year, n))+geom_line(group = 1, color = 'red')+geom_point(color ='black') + labs(title = "Traffic Stops Per Year")+theme(plot.title = element_text(hjust = 0.5, face = "bold"))+ ylab("Number of Stops")
+ggplot(yearly_stops, aes(Year, n))+geom_line(group = 1, color = 'red')+
+  geom_point(color ='black') + labs(title = "Traffic Stops Per Year")+
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"))+ ylab("Number of Stops")
 
 yearly_stops
 ```
@@ -250,27 +251,27 @@ traff_violations_filtered_2 %>%
   theme_minimal()
 ```
 
-## Further Analyses / Conclusion
-## Findings
+## What are our Findings?
  Within our analyses, we considered the most common and least common findings we had at hand. The plot of car makes and how many times throughout the data a specific make was pulled over helped our group come up with some interesting results from our first question.
  
- The bar graph we created had a significant portion of Toyota makes taking the top place as most pulled over vehicle. As one imagines this is not surprising, being one of the top selling car makes in the United States of America. Considering the reputation of other cars such as a Honda or Ford, they are also unsurprisingly nearing the most pulled over as well. Our least pulled over vehicle was the make of Nissan. They most likely take up a smaller portion of the U.S. market and therefore have a smaller presence in most U.S. states.
+ The bar graph we created had a significant portion of Toyota makes taking the top place as the most pulled over vehicle. As one might imagine, this is not surprising, being one of the top selling car makes in the United States of America. Considering the reputation of other cars such as a Honda or Ford, they were also unsurprisingly among the most pulled over as well. Our least pulled over vehicle was the make of Nissan. They most likely take up a smaller portion of the U.S. market and therefore have a smaller presence in most U.S. states.
  
  For findings in relation to time, the first question was "What times during the week are traffic stops most likely to happen?". We used a heat map to look into patterns among the traffic stops and specifically, we saw that weekdays and weekends had inverse times for them. During weekdays, the most traffic stops happened during the hours from 7:00 AM to 6:00 PM. For the weekends, the majority of stops happened around late night to early mornings. The least common times are respective to the other hours for weekdays and weekends. 
   
+  For our questions regarding what times during the months of a year, we found a couple of things: first, we noticed that a majority of the traffic stops happened slightly after the beginning of the year but dipped to its minimum in the summer months. The highest point here, which is truly a point, was during March.
   
-  For our questions regarding what times during the months of a year, we found a couple of things: first, we noticed that a majority of the traffic stops happened slightly after the beginning of the year but dipped to its minimum in the summer months. The highest point here, which is truly a point, was during march.
+  Going forwards, the data for different years had some inherently interesting trends. Over the years of 2012 to 2013, there seems to be a trend upwards until a near peak in 2014. Then from 2015 to 2019 we have a sharp decline. Of course, after this point, 2020 marks the pandemic so we have an all time low throughout the data. More or less the trend picks back up to a more normal trend.
   
-  Going forwards, the data for different years had some inherently interesting trends. Over the years of 2012 to 2013, there seems to be a a trend upwards until a near peak in 2014. Then from 2015 to 2019 we have a sharp declination. Of course after this point, 2020 marks the pandemic so we have an all time low throughout the data. More of less the trend picks back up to a more normal trend.
+  For our 4th question, the correlation of injury to seat belts was examined, and found that the obvious assumption of seatbelts being a useful instrument of human life protection, held true. Once again utilizing a heat map, we found, through a less complex system, that the data showed fewer injuries with more seat belt usage.
   
-  For our 4th question, the correlation of injury to seat belts was examined, and found that the obvious assumption of seatbelts being a useful instrument of human life protection, held true. Utilizing once agin a heat map, we found through an less complex system, that the data was more populated in less injuries and more seat belts.
+  For a comparison of traffic stops and race plus sex of an individual, we faceted several graphs together based on separate races and found a majority of the data showed men being stopped more than women. Additionally, Black individuals were stopped most, while other groups were stopped less frequently.
   
-  For a comparison of traffic stops and race plus sex of an individual, we facted several graphs together based on separate races and found a majority of the data had men being stopped more thatn women. Additionally, people of the black community were stopped most and those others were less than that.
+  In our final graph, we did a simple bar graph with two options: Marylanders and non-Marylanders, and who within Montgomery County where each driver was from during their stop. This was a harder dataset to tidy and combine into any graph, so we made do with a numerical count of each. Here we find an  overwhelming amount of traffic stops involved Marylanders.
   
-  In our final graph, we did a simple bar graph with two options: Marylanders and non-Marlyanders, and who within Montgomery County during there stop was from where. This was a harder dataset to tidy and combine into any graph, so we made due with a numerical count of each. Here we find an  overwhelming amount of traffic stop are against Marylanders.
-  
-  
- 
+## Limitations:
+While our project provided some insight into various variables related to traffic stops/violations, it also presented some limitations. Much of the data consisted of binary yes and no responses (1s and 0s), which limited the complexity of our statistical modeling and visualizations. 
+
+Our findings apply specifically to traffic stops that occurred throughout the years in Maryland. Additionally, since the data-set is unique to Maryland, the findings may not be the same as in other regions that may have different policies, demographics, or procedures. In the future it would be helpful to see how the data is different or even similar in these other regions. 
  
  
  
